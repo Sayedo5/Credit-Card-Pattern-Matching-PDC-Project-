@@ -1,5 +1,7 @@
 node_modules
 dist
 dist-ssr
+.verify
+.check
 *.local
 .vite

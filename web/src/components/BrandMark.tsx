@@ -1,26 +1,9 @@
-import type { ApiBrand } from '../api';
-
-/**
- * Accent colours and glyphs are pure styling, keyed by the brand id that the
- * CUDA table hands over. Adding a network on the GPU side without adding a
- * colour here still works — it just falls back to slate.
- */
-const BRAND_COLOR: Record<string, string> = {
-  visa: '#1a1f71',
-  mastercard: '#eb001b',
-  amex: '#006fcf',
-  jcb: '#0b4ea2',
-  diners: '#0079be',
-  discover: '#ff6000',
-  unionpay: '#e21836',
-  maestro: '#6c6bbd',
-};
-
-const FALLBACK_COLOR = '#475569';
+import type { CardBrand } from '../core';
 
 /**
  * Generic geometric marks in each network's accent colour — not reproductions
- * of the real trademarks.
+ * of the real trademarks. The colour comes from the brand table in
+ * core/cardBrands.ts; only the glyph shape is decided here.
  */
 function Glyph({ id }: { id: string }) {
   const common = { 'aria-hidden': true, focusable: false } as const;
@@ -69,7 +52,7 @@ function Glyph({ id }: { id: string }) {
 }
 
 type Props = {
-  brand: ApiBrand;
+  brand: CardBrand;
   size?: 'md' | 'sm';
   title?: string;
 };
@@ -78,7 +61,7 @@ export function BrandMark({ brand, size = 'md', title }: Props) {
   return (
     <span
       className={size === 'sm' ? 'mark mark--sm' : 'mark'}
-      style={{ background: BRAND_COLOR[brand.id] ?? FALLBACK_COLOR }}
+      style={{ background: brand.color }}
       title={title ?? `${brand.name} — starts with ${brand.prefixLabel}`}
     >
       <span style={{ color: '#fff', display: 'inline-flex' }}>

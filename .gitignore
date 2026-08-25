@@ -1,12 +1,6 @@
-# CUDA build artifacts
-cuda/*.so
-cuda/*.o
-cuda/card_matcher_selftest
+# Node
+node_modules/
 
 # Python
 __pycache__/
 *.pyc
-.venv/
-
-# Node (see web/.gitignore for the rest)
-node_modules/
