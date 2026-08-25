@@ -1,0 +1,12 @@
+# CUDA build artifacts
+cuda/*.so
+cuda/*.o
+cuda/card_matcher_selftest
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node (see web/.gitignore for the rest)
+node_modules/
