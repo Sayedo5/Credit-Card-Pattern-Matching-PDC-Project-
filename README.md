@@ -38,9 +38,17 @@ You need an NVIDIA GPU. This project was set up to use Colab's free T4.
 
 1. Push your latest commit to GitHub.
 2. Open `CUDA_Backend.ipynb` in [Colab](https://colab.research.google.com).
-3. **Runtime → Change runtime type → T4 GPU.** Without this, `cm_init()`
+3. Click the **▾ next to "Connect" → Change runtime type → T4 GPU → Save**,
+   then click the plain **Connect** button. Without a GPU runtime, `cm_init()`
    fails at startup with *"no CUDA device found"*.
 4. **Runtime → Run all.**
+
+> **Do not use "Connect to a local runtime".** It opens a *Local connection
+> settings* dialog asking for a Backend URL like `http://localhost:8888/?token=…`.
+> That is a Jupyter server on your own machine and is unrelated to this
+> project — and a laptop without an NVIDIA GPU cannot run the kernel anyway.
+> The tunnel URL this notebook prints goes into the **React app**, never into
+> a Colab dialog.
 
 The notebook runs a preflight check, hard-resets the checkout onto your latest
 push, compiles for the exact compute capability of the GPU it was given, runs

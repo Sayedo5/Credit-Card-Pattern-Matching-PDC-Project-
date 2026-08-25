@@ -43,9 +43,25 @@ tests it, and puts an HTTP door in front of it.
 
 ### Before you run anything
 
-1. **Runtime → Change runtime type → Hardware accelerator → T4 GPU**, then Save.
-2. **Push your latest commit to GitHub** — step 2 clones from there.
-3. **Runtime → Run all.**
+**1. Connect to a hosted GPU runtime.**
+
+Click the **▾ arrow next to "Connect"** (top right) → **Change runtime type** →
+Hardware accelerator → **T4 GPU** → **Save**. Then click the plain **Connect**
+button and wait for the RAM / Disk meter to appear.
+
+> ⚠️ **Do not pick "Connect to a local runtime".** That opens a *Local
+> connection settings* dialog asking for a "Backend URL" like
+> \`http://localhost:8888/?token=…\`. That is a Jupyter server on your own PC —
+> it has nothing to do with this project, and your laptop has no NVIDIA GPU to
+> run CUDA on. If you see that dialog, close it and use **Change runtime type**
+> instead.
+
+**2. Push your latest commit to GitHub** — step 3 clones from there.
+
+**3. Runtime → Run all.**
+
+Step 2 of this notebook prints \`PASS  GPU  Tesla T4\`. If it does not, you are
+not on a hosted GPU runtime yet — go back and redo step 1 above.
 
 ### If it stops responding later
 
@@ -363,12 +379,17 @@ PUBLIC_URL = start_tunnel()
 print()
 print("=" * 72)
 print()
-print("   PASTE THIS INTO THE REACT APP")
-print("   (click 'change' at the bottom of the panel)")
+print("   " + PUBLIC_URL)
 print()
-print("      " + PUBLIC_URL)
+print("=" * 72)
 print()
-print("=" * 72)`),
+print("Where this goes:")
+print("  1. open the React app in your browser  ->  http://localhost:5173")
+print("  2. click 'change' at the bottom of the card panel")
+print("  3. paste the URL above, press Connect")
+print()
+print("This is NOT a Colab setting. Do not paste it into 'Local connection")
+print("settings' or any Colab dialog -- it goes into the web app only.")`),
 
   /* ------------------------------------------------------------------ */
   md(`## 7. Status — run this whenever the app says "offline"
@@ -546,6 +567,8 @@ status()`),
 
 | Symptom | Cause | Fix |
 |---|---|---|
+| Colab shows a **"Local connection settings"** dialog asking for a Backend URL | You clicked *Connect to a local runtime*. That wants a Jupyter server on your own PC and is unrelated to this project | Close it. Use **▾ next to Connect → Change runtime type → T4 GPU**, then plain **Connect** |
+| No URL printed anywhere, cells produced nothing | The notebook never ran on a GPU runtime | Check step 2 prints \`PASS  GPU\`. If not, connect a hosted T4 runtime first |
 | App says **GPU backend offline**, and step 7 shows both processes NOT running | The Colab session disconnected — the usual cause after it worked for a while | Re-run step 6, paste the new URL into the app |
 | Step 7 shows both processes running, app still offline | The app is holding an old tunnel URL | Copy the URL from step 7 into the app's **change** field |
 | Step 2 fails on the GPU row | Runtime has no accelerator | Runtime → Change runtime type → **T4 GPU** |
