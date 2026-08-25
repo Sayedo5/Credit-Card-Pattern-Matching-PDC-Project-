@@ -6,6 +6,7 @@
  * Test:   ./card_matcher_selftest
  */
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -233,10 +234,12 @@ int cm_match_batch_gpu(const char *flat, const int *lens, int n, int *outBrand,
  */
 int cm_match_batch_cpu(const char *flat, const int *lens, int n, int *outBrand,
                        int *outLuhn, int *outNearMiss, double *cpuMs) {
-  cudaEvent_t a, b;
-  cudaEventCreate(&a);
-  cudaEventCreate(&b);
-  cudaEventRecord(a);
+  /*
+   * Host-side work has to be timed with a host clock. cudaEvent timestamps
+   * come off the device timeline, which measures when the markers were
+   * *executed* on the GPU, not how long this loop took on the CPU.
+   */
+  const auto start = std::chrono::steady_clock::now();
 
   for (int i = 0; i < n; ++i) {
     const char *digits = flat + (size_t)i * CM_MAX_LEN;
@@ -248,13 +251,9 @@ int cm_match_batch_cpu(const char *flat, const int *lens, int n, int *outBrand,
     outLuhn[i] = (len > 0 && len <= CM_MAX_LEN) ? cm_luhn(digits, len) : 0;
   }
 
-  cudaEventRecord(b);
-  cudaEventSynchronize(b);
-  float ms = 0.f;
-  cudaEventElapsedTime(&ms, a, b);
-  if (cpuMs) *cpuMs = (double)ms;
-  cudaEventDestroy(a);
-  cudaEventDestroy(b);
+  const auto end = std::chrono::steady_clock::now();
+  if (cpuMs)
+    *cpuMs = std::chrono::duration<double, std::milli>(end - start).count();
   return 0;
 }
 

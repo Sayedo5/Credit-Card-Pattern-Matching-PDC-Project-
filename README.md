@@ -42,9 +42,26 @@ You need an NVIDIA GPU. This project was set up to use Colab's free T4.
    fails at startup with *"no CUDA device found"*.
 4. **Runtime → Run all.**
 
-The notebook compiles the `.cu` with `nvcc`, runs the GPU self-test, starts
-FastAPI, and opens a public `https://….trycloudflare.com` tunnel. It prints
-that URL in a box — copy it.
+The notebook runs a preflight check, hard-resets the checkout onto your latest
+push, compiles for the exact compute capability of the GPU it was given, runs
+the self-test, starts FastAPI, and opens a public
+`https://….trycloudflare.com` tunnel. It prints that URL in a box — copy it.
+
+### When it stops responding
+
+Colab disconnects an idle session after roughly 90 minutes, and that kills both
+the API and the tunnel. This is the usual reason a backend that was working
+goes quiet.
+
+Run **step 7 (Status)** in the notebook. It reports which of the two processes
+died, tails the relevant log, and re-checks `/api/health` both locally and
+through the tunnel. Then re-run **step 6 (Launch)** — it is idempotent, so it
+cleans up whatever is left over and starts fresh.
+
+**You will get a new tunnel URL every launch.** Cloudflare quick tunnels are
+anonymous and disposable, which is exactly why the app takes the backend
+address at runtime instead of baking it in at build time. Paste the new one
+into the app's **change** field.
 
 ### 2. Start the front end (your PC)
 
@@ -191,7 +208,18 @@ the boundary rejections either side of every numeric range (`2220`/`2721`,
 a 1,000,000-card benchmark that cross-checks every GPU result against the CPU
 path.
 
-Step 4 of `CUDA_Backend.ipynb` runs the same thing in Colab.
+Step 5 of `CUDA_Backend.ipynb` runs the same thing in Colab.
+
+### Editing the Colab notebook
+
+`CUDA_Backend.ipynb` is a generated artifact. Edit
+`tools/build_colab_notebook.mjs` and regenerate:
+
+```bash
+node tools/build_colab_notebook.mjs
+```
+
+Hand-editing the `.ipynb` works but the next regeneration overwrites it.
 
 ---
 
@@ -201,6 +229,10 @@ Step 4 of `CUDA_Backend.ipynb` runs the same thing in Colab.
 .
 ├── PDC_Project.ipynb          # original coursework notebook (unchanged)
 ├── CUDA_Backend.ipynb         # Colab: build the CUDA, serve it, tunnel it
+│                              #   (generated — edit the script below instead)
+├── tools/
+│   └── build_colab_notebook.mjs
+
 ├── cuda/
 │   ├── card_patterns.cuh      # THE ALGORITHM — table, Luhn, prefix matching
 │   ├── card_matcher.cu        # kernel, brand table, C ABI, CPU baseline
